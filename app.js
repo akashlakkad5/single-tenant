@@ -9,3 +9,7 @@ require("dotenv").config();
 
 //Express File
 require("./loaders/express")
+
+//Db connection
+const dbOps = require("./loaders/mongo")
+dbOps.connection();
