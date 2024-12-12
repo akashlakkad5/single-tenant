@@ -12,8 +12,10 @@ const bcrypt = require('bcrypt');
  * const hashedPassword = await bcryptPassword({ password: 'mySecurePassword' });
  * console.log(hashedPassword); // '$2a$10$...hashedPassword...'
  */
-exports.bcryptPassword = ({ password }) => {
-    return bcrypt.hash(password, 10);
+exports.bcryptPassword = async (password) => {
+    if (!password)
+        throw new Error("Password is required to hash");
+    return await bcrypt.hash(password, 10);
 };
 
 exports.comparePassword = ({password, hash}) => {

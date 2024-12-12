@@ -8,7 +8,7 @@ app.use(express.static('public'));
 
 
 app.get('/test', (req, res) => {
-    res.status(200).send('.');
+    res.status(200).send('Hello ');
 });
 
 //APIS

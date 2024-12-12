@@ -1,5 +1,5 @@
 const { bcrypt } = require("../../utils");
-const { users } = require('../../models')
+const { users } = require('../../models');
 //register user
 
 exports.registerUser = (req) => {
@@ -7,7 +7,7 @@ exports.registerUser = (req) => {
         const checkUserExistance = () => {
             return new Promise(async (resolve, reject) => {
                 try {
-                    const userDetails = await users.findOne({ email: req.body.email, })
+                    const userDetails = await db.collection('users').findOne({ email: req.body.email, })
                     if (userDetails) {
                         return reject({
                             error: "User Already Exists",
@@ -23,12 +23,12 @@ exports.registerUser = (req) => {
         }
 
         const createUser = () => {
-            new Promise(async (resolve, reject) => {
+           return new Promise(async (resolve, reject) => {
                 try {
 
-                    await users.insertOne({
+                    await db.collection('users').insertOne({
                         ...req.body,
-                        password: await bcrypt.hash(req.body.password)
+                        password: await bcrypt.bcryptPassword(req.body.password)
                     })
 
                     return resolve({ ...req.body })
@@ -51,7 +51,7 @@ exports.login = (req) =>
             new Promise(async (resolve, reject) => {
                 try {
 
-                    const userDetails = await User.find({ email: req?.body?.email })
+                    const userDetails = await db.collection('users').find({ email: req?.body?.email })
 
                     if (!userDetails) {
                         return reject({
