@@ -16,3 +16,10 @@ exports.login = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
 }).options({ stripUnknown: true });
+
+// Update Password
+exports.updatePassword = Joi.object({
+    user: Joi.string().email().required(),
+    password: Joi.string().required(),
+    cpassword: Joi.string().required(),
+}).options({ stripUnknown: true });

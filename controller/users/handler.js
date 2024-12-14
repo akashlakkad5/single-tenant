@@ -1,5 +1,5 @@
-const { bcrypt } = require("../../utils");
-const { users } = require('../../models');
+const { bcrypt, jwt } = require("../../utils");
+
 //register user
 
 exports.registerUser = (req) => {
@@ -46,12 +46,12 @@ exports.registerUser = (req) => {
 
 exports.login = (req) =>
     new Promise((resolve, reject) => {
-
+        let userDetails
         const userLogin = () =>
             new Promise(async (resolve, reject) => {
                 try {
 
-                    const userDetails = await db.collection('users').find({ email: req?.body?.email })
+                    userDetails = await db.collection('users').findOne({ email: req?.body?.email });
 
                     if (!userDetails) {
                         return reject({
@@ -77,5 +77,73 @@ exports.login = (req) =>
                     return reject(error)
                 }
             })
-            userLogin().then(resolve).catch(reject)
+        const createToken = () => 
+            new Promise(async (resolve, reject) => {
+                try {
+                    let createToken = await jwt.createToken({ payload: userDetails })
+                    if(createToken){
+                        await db.collection('tokens').insertOne({
+                            user: userDetails?._id,
+                            token: createToken
+                        })
+                    }
+                    return resolve();
+                } catch (error) {
+                    console.log("createToken", error)
+                    return reject(error)
+                }
+            })
+        userLogin().then(createToken).then(resolve).catch(reject)
+    })
+
+exports.updatePassword = (req) =>
+    new Promise((resolve, reject) => {
+        try {
+            const checkUserExistance = () =>
+                new Promise(async (resolve, reject) => {
+                    try {
+                        let userDetails = await db.collection('users').findOne({
+                            _id: req.body.user
+                        })
+                        if (!userDetails) {
+                            return reject({
+                                error: 'user not found',
+                                code: 412
+                            })
+                        }
+                        return resolve();
+                    } catch (error) {
+                        console.log("Error: checkUserExistance" + error)
+                        return reject(error)
+                    }
+                })
+
+            const updatePassword = () =>
+                new Promise(async (resolve, reject) => {
+                    try {
+                        if (req?.body?.password !== req?.body?.cpassword) {
+                            return reject({
+                                error: 'Passwords do not match with the confirm password',
+                                code: 412
+                            })
+                        }
+                        let uPassword = await db.collection('users').findOneAndUpdate(
+                            { _id: new ObjectId(req?.body?.user) }, // Query
+                            { $set: { password: await bcrypt.bcryptPassword(req.body.password) } }, // Update
+                            { returnDocument: "after" } // Options: Return the updated document
+                        );
+                        console.log(uPassword)
+                        return resolve();
+                    } catch (error) {
+                        console.log("Error: updatePassword" + error)
+                        return reject(error)
+                    }
+                })
+
+            checkUserExistance().then(updatePassword).then(resolve).catch(reject)
+
+        } catch (error) {
+            console.log("updatePassword", error)
+            return reject(error)
+        }
     })

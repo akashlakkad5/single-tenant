@@ -10,3 +10,8 @@ exports.loginUser = {
     handler: handler.login,
     payload: payload.login,
 }
+
+exports.updatePassword = {
+    handler: handler.updatePassword,
+    payload: payload.updatePassword,
+}

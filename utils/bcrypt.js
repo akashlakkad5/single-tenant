@@ -18,6 +18,6 @@ exports.bcryptPassword = async (password) => {
     return await bcrypt.hash(password, 10);
 };
 
-exports.comparePassword = ({password, hash}) => {
+exports.comparePassword = (password, hash) => {
     return bcrypt.compare(password, hash);
 }
