@@ -103,7 +103,7 @@ exports.updatePassword = (req) =>
                 new Promise(async (resolve, reject) => {
                     try {
                         let userDetails = await db.collection('users').findOne({
-                            _id: req.body.user
+                            _id: req.session._id
                         })
                         if (!userDetails) {
                             return reject({
@@ -121,14 +121,14 @@ exports.updatePassword = (req) =>
             const updatePassword = () =>
                 new Promise(async (resolve, reject) => {
                     try {
-                        if (req?.body?.password !== req?.body?.cpassword) {
+                        if (req?.body?.password !== req?.body?.cPassword) {
                             return reject({
                                 error: 'Passwords do not match with the confirm password',
                                 code: 412
                             })
                         }
                         let uPassword = await db.collection('users').findOneAndUpdate(
-                            { _id: new ObjectId(req?.body?.user) }, // Query
+                            { _id: req.session._id }, // Query
                             { $set: { password: await bcrypt.bcryptPassword(req.body.password) } }, // Update
                             { returnDocument: "after" } // Options: Return the updated document
                         );

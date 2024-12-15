@@ -1,7 +1,7 @@
 const { payload, jwt } = require("../utils");
 
 exports.auth = async (req, res, next) => {
-
+    let userDetails
     let token = req.headers.authorization;
     if (!token) {
         return payload.sendResponse({
@@ -13,7 +13,7 @@ exports.auth = async (req, res, next) => {
 
     let data = await jwt.verifyToken(token);
 
-    let userDetails = await db.collection('users').findOne({ email: data.email });
+    userDetails = await db.collection('users').findOne({ email: data.email });
     if (!userDetails) {
         return payload.sendResponse({
             res,
@@ -22,10 +22,10 @@ exports.auth = async (req, res, next) => {
         })
     }
     req.session = {
-        firstName: userDetail?.firstName,
-        lastName: userDetail?.lastName,
-        _id: userDetail?._id,
-        email: userDetail?.email,
+        firstName: userDetails?.firstName,
+        lastName: userDetails?.lastName,
+        _id: userDetails?._id,
+        email: userDetails?.email,
     };
 
     next();

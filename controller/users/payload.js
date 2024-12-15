@@ -19,7 +19,7 @@ exports.login = Joi.object({
 
 // Update Password
 exports.updatePassword = Joi.object({
-    user: Joi.string().email().required(),
+    user: Joi.string().required(),
     password: Joi.string().required(),
-    cpassword: Joi.string().required(),
+    cPassword: Joi.string().required(),
 }).options({ stripUnknown: true });
